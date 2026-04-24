@@ -15,12 +15,22 @@ build:
     env:
       CARGO_PROFILE_RELEASE_STRIP: symbols
       CARGO_PROFILE_RELEASE_LTO: fat
+      # Ring's C/asm code requires clang-cl (not MSVC cl.exe) when targeting
+      # aarch64-pc-windows-msvc. These vars are only consulted by cargo / cc-rs
+      # when CARGO_BUILD_TARGET is that triple, so they are inert elsewhere.
+      CC_aarch64_pc_windows_msvc: clang-cl
+      AR_aarch64_pc_windows_msvc: llvm-lib
+      CARGO_TARGET_AARCH64_PC_WINDOWS_MSVC_LINKER: lld-link
     content:
       - if: unix
         then:
           - cargo auditable install --locked --no-track --bins --root ${{ PREFIX }} --path .
         else:
-          - cargo auditable install --locked --no-track --bins --root %LIBRARY_PREFIX% --path .
+          - if: target_platform == "win-arm64"
+            then:
+              - cargo auditable install --locked --no-track --bins --root %LIBRARY_PREFIX% --path . --target aarch64-pc-windows-msvc
+            else:
+              - cargo auditable install --locked --no-track --bins --root %LIBRARY_PREFIX% --path .
       - cargo-bundle-licenses --format yaml --output ./THIRDPARTY.yml
 
 requirements:
@@ -30,6 +40,10 @@ requirements:
     - ${{ compiler('rust') }}
     - cargo-bundle-licenses
     - cargo-auditable
+    - if: target_platform == "win-arm64"
+      then:
+        - clang
+        - lld
 
 tests:
   - script: sendme --help
