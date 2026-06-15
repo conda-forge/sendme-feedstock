@@ -1,5 +1,5 @@
 context:
-  version: "0.34.0"
+  version: "0.36.0"
 
 package:
   name: sendme
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/n0-computer/sendme/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 5231ce3bf8636d0aa98dc612e0288ca3083d55d2983ae666d98762a9af926709
+  sha256: 69897a9785c5b87c769417f77de8bff6e34e5391eed3d2df5d270599daf485ad
 
 build:
   number: 0
